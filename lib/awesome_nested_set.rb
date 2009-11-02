@@ -484,8 +484,13 @@ module CollectiveIdea #:nodoc:
         
         # reload left, right, and parent
         def reload_nested_set
-          reload(:select => "#{quoted_left_column_name}, " +
+          instance_variable_set "@parent", nil # in case you override parent as an association
+          r = self.class.find(self.id, :select => "#{quoted_left_column_name}, " +
             "#{quoted_right_column_name}, #{quoted_parent_column_name}")
+          [left_column_name, right_column_name, parent_column_name].each do |c|
+            self[c] = r[c]
+          end
+          self
         end
         
         def move_to(target, position)
